@@ -45,7 +45,7 @@ namespace RaceDay.Api.Controllers
                 });
 
             if (role != "Organiser")
-                return Forbid();
+                return StatusCode(403);
 
             var enrolment = await _context.Enrolments
                 .Include(e => e.Event)
@@ -60,7 +60,7 @@ namespace RaceDay.Api.Controllers
 
             if (enrolment.Event == null ||
                 enrolment.Event.OrganiserID != userId.Value)
-                return Forbid();
+                return StatusCode(403);
 
             if (enrolment.Status != "Confirmed")
             {
@@ -118,7 +118,7 @@ namespace RaceDay.Api.Controllers
                 return Unauthorized();
 
             if (role != "Participant")
-                return Forbid();
+                return StatusCode(403);
 
             var results = await _context.Results
                 .Where(r =>
@@ -140,7 +140,7 @@ namespace RaceDay.Api.Controllers
                 return Unauthorized();
 
             if (role != "Organiser")
-                return Forbid();
+                return StatusCode(403);
 
             var ev = await _context.Events
                 .FirstOrDefaultAsync(e => e.EventID == eventId);
@@ -152,7 +152,7 @@ namespace RaceDay.Api.Controllers
                 });
 
             if (ev.OrganiserID != userId.Value)
-                return Forbid();
+                return StatusCode(403);
 
             var results = await _context.Results
                 .Where(r =>
@@ -176,7 +176,7 @@ namespace RaceDay.Api.Controllers
                 return Unauthorized();
 
             if (role != "Organiser")
-                return Forbid();
+                return StatusCode(403);
 
             var result = await _context.Results
                 .Include(r => r.Enrolment)
@@ -194,12 +194,13 @@ namespace RaceDay.Api.Controllers
             {
                 return NotFound(new
                 {
-                    message = "Associated enrolment or event not found."
+                    message =
+                        "Associated enrolment or event not found."
                 });
             }
 
             if (result.Enrolment.Event.OrganiserID != userId.Value)
-                return Forbid();
+                return StatusCode(403);
 
             if (request.FinishingPosition.HasValue &&
                 request.FinishingPosition.Value < 1)

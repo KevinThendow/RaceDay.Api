@@ -319,8 +319,8 @@ namespace RaceDay.Api.Tests
                 HttpStatusCode.BadRequest,
                 response.StatusCode);
         }
-    
-[Fact]
+
+        [Fact]
         public async Task Register_WithMissingFields_ReturnsBadRequest()
         {
             var registerData = new
@@ -367,6 +367,82 @@ namespace RaceDay.Api.Tests
             Assert.Equal(
                 HttpStatusCode.Unauthorized,
                 response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Participant_CannotUpdateResult_ReturnsForbidden()
+        {
+            var email = $"participant_{Guid.NewGuid():N}@test.com";
+
+            // Register a participant
+            var registerData = new
+            {
+                firstName = "Test",
+                lastName = "Participant",
+                email = email,
+                password = "TestPassword123!",
+                role = "Participant",
+                phoneNumber = "0712345678",
+                dateOfBirth = "1997-05-08"
+            };
+
+            var registerContent = new StringContent(
+                System.Text.Json.JsonSerializer.Serialize(registerData),
+                Encoding.UTF8,
+                "application/json");
+
+            var registerResponse = await _client.PostAsync(
+                "/api/auth/register",
+                registerContent);
+
+            Assert.True(
+                registerResponse.IsSuccessStatusCode,
+                await registerResponse.Content.ReadAsStringAsync());
+
+            // Log in as the participant
+            var loginData = new
+            {
+                email = email,
+                password = "TestPassword123!"
+            };
+
+            var loginContent = new StringContent(
+                System.Text.Json.JsonSerializer.Serialize(loginData),
+                Encoding.UTF8,
+                "application/json");
+
+            var loginResponse = await _client.PostAsync(
+                "/api/auth/login",
+                loginContent);
+
+            Assert.True(
+                loginResponse.IsSuccessStatusCode,
+                await loginResponse.Content.ReadAsStringAsync());
+
+            // Attempt to update a result
+            var updateData = new
+            {
+                finishTime = "00:35:12",
+                finishingPosition = 1
+            };
+
+            var updateContent = new StringContent(
+                System.Text.Json.JsonSerializer.Serialize(updateData),
+                Encoding.UTF8,
+                "application/json");
+
+            var response = await _client.PutAsync(
+                "/api/results/1",
+                updateContent);
+
+            var responseBody =
+    await response.Content.ReadAsStringAsync();
+
+            Assert.True(
+                response.StatusCode == HttpStatusCode.Forbidden,
+                $"Expected 403 Forbidden, but received " +
+                $"{(int)response.StatusCode} " +
+                $"{response.StatusCode}. Response: {responseBody}");
         }
     }
 }
