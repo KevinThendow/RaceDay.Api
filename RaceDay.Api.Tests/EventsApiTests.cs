@@ -303,7 +303,9 @@ namespace RaceDay.Api.Tests
                 lastName = "User",
                 email = $"invalidrole_{Guid.NewGuid():N}@test.com",
                 password = "TestPassword123!",
-                role = "Administrator"
+                role = "Administrator" ,
+                phoneNumber = "0712345678",
+                dateOfBirth = "1997-05-08"
             };
 
             var content = new StringContent(
