@@ -73,7 +73,7 @@ not commit real passwords or secrets to a public repository.
 
 ## How to Run the API
 
-1.  Open `RaceDay.Api.sln` in Visual Studio.
+1.  Open `<img width="960" height="504" alt="image" src="https://github.com/user-attachments/assets/43aea454-faa6-456b-8168-84991378638a" />` in Visual Studio.
 2.  Restore NuGet packages.
 3.  Check the SQL Server connection string and ensure the database
     exists.
