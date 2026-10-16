@@ -148,5 +148,49 @@ namespace RaceDay.Api.Controllers
 
             return Ok(results.Select(ToDto));
         }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateResult(
+        int id,
+        [FromBody] UpdateResultRequest request)
+        {
+            int? userId = HttpContext.Session.GetInt32("UserId");
+            string? role = HttpContext.Session.GetString("Role");
+
+            if (userId == null)
+                return Unauthorized();
+
+            if (role != "Organiser")
+                return Forbid();
+
+            var result = await _context.Results
+                .Include(r => r.Enrolment)
+                .ThenInclude(e => e.Event)
+                .FirstOrDefaultAsync(r => r.ResultID == id);
+
+            if (result == null)
+                return NotFound("Result not found.");
+
+            if (result.Enrolment.Event.OrganiserID != userId.Value)
+                return Forbid();
+
+            if (request.FinishingPosition.HasValue &&
+                request.FinishingPosition.Value <= 0)
+            {
+                return BadRequest(
+                    "Finishing position must be greater than zero.");
+            }
+
+            result.FinishTime = request.FinishTime;
+            result.FinishingPosition = request.FinishingPosition;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Result updated successfully.",
+                resultId = result.ResultID
+            });
+        }
     }
 }

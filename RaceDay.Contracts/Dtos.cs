@@ -10,6 +10,11 @@ namespace RaceDay.Contracts
         [Required]
         public string LastName { get; set; } = string.Empty;
 
+        [Required]
+        public string PhoneNumber { get; set; } = string.Empty;
+
+        [Required]
+        public DateTime? DateOfBirth { get; set; }
         [Required, EmailAddress]
         public string Email { get; set; } = string.Empty;
 
@@ -160,6 +165,13 @@ namespace RaceDay.Contracts
         [Range(1, int.MaxValue)]
         public int EnrolmentId { get; set; }
 
+        public TimeSpan? FinishTime { get; set; }
+
+        [Range(1, int.MaxValue)]
+        public int? FinishingPosition { get; set; }
+    }
+    public class UpdateResultRequest
+    {
         public TimeSpan? FinishTime { get; set; }
 
         [Range(1, int.MaxValue)]

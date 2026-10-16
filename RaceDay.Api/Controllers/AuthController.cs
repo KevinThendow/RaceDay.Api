@@ -63,6 +63,8 @@ namespace RaceDay.Api.Controllers
                 FirstName = request.FirstName.Trim(),
                 LastName = request.LastName.Trim(),
                 Email = email,
+                PhoneNumber = request.PhoneNumber.Trim(),
+                DateOfBirth = request.DateOfBirth,
                 Role = request.Role,
                 CreatedAt = DateTime.Now
             };

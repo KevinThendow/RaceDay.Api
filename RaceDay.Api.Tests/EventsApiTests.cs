@@ -103,7 +103,9 @@ namespace RaceDay.Api.Tests
                 lastName = "Participant",
                 email = email,
                 password = "TestPassword123!",
-                role = "Participant"
+                role = "Participant",
+                phoneNumber = "0712345678",
+                dateOfBirth = "1997-05-08"
             };
 
             var registerContent = new StringContent(
@@ -204,7 +206,9 @@ namespace RaceDay.Api.Tests
                 lastName = "User",
                 email = email,
                 password = "CorrectPassword123!",
-                role = "Participant"
+                role = "Participant",
+                phoneNumber = "0712345678",
+                dateOfBirth = "1997-05-08"
             };
 
             var registerContent = new StringContent(
@@ -253,7 +257,9 @@ namespace RaceDay.Api.Tests
                 lastName = "User",
                 email = email,
                 password = "TestPassword123!",
-                role = "Participant"
+                role = "Participant",
+                phoneNumber = "0712345678",
+                dateOfBirth = "1997-05-08"
             };
 
             var json =
