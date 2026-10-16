@@ -8,6 +8,9 @@ using RaceDay.Contracts;
 
 namespace RaceDay.Api.Controllers
 {
+    /// <summary>
+    /// Provides user registration, login and logout endpoints.
+    /// </summary>
     [ApiController]
     [Route("api/auth")]
     public class AuthController : ControllerBase
@@ -15,13 +18,28 @@ namespace RaceDay.Api.Controllers
         private readonly RaceDayDbContext _context;
         private readonly PasswordHasher<AppUser> _passwordHasher;
 
+        /// <summary>
+        /// Initializes the authentication controller.
+        /// </summary>
+        /// <param name="context">The RaceDay database context.</param>
         public AuthController(RaceDayDbContext context)
         {
             _context = context;
             _passwordHasher = new PasswordHasher<AppUser>();
         }
 
+        /// <summary>
+        /// Registers a new organiser or participant account.
+        /// </summary>
+        /// <param name="request">The new user's registration details.</param>
+        /// <returns>The created user's details or an error response.</returns>
+        /// <response code="201">The account was registered successfully.</response>
+        /// <response code="400">Required fields or the user role are invalid.</response>
+        /// <response code="409">An account with the email already exists.</response>
         [HttpPost("register")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Register(
             [FromBody] RegisterRequest request)
         {
@@ -86,7 +104,18 @@ namespace RaceDay.Api.Controllers
             });
         }
 
+        /// <summary>
+        /// Authenticates a user and creates a session.
+        /// </summary>
+        /// <param name="request">The user's email and password.</param>
+        /// <returns>The authenticated user's details or an error response.</returns>
+        /// <response code="200">Login succeeded.</response>
+        /// <response code="400">Email or password was not supplied.</response>
+        /// <response code="401">The email or password is incorrect.</response>
         [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login(
             [FromBody] LoginRequest request)
         {
@@ -140,7 +169,13 @@ namespace RaceDay.Api.Controllers
             });
         }
 
+        /// <summary>
+        /// Clears the current user's session.
+        /// </summary>
+        /// <returns>A confirmation that logout succeeded.</returns>
+        /// <response code="200">Logout succeeded.</response>
         [HttpPost("logout")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
