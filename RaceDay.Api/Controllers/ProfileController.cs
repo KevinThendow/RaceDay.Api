@@ -7,18 +7,33 @@ using RaceDay.Contracts;
 
 namespace RaceDay.Api.Controllers
 {
+    /// <summary>
+    /// Provides endpoints for viewing and updating the logged-in user's profile.
+    /// </summary>
     [ApiController]
     [Route("api/profile")]
     public class ProfileController : ControllerBase
     {
         private readonly RaceDayDbContext _context;
 
+        /// <summary>
+        /// Initializes the profile controller.
+        /// </summary>
+        /// <param name="context">The RaceDay database context.</param>
         public ProfileController(RaceDayDbContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// Retrieves the profile of the currently logged-in user.
+        /// </summary>
+        /// <returns>The user's profile details.</returns>
+        /// <response code="200">The profile was retrieved successfully.</response>
+        /// <response code="401">The user is not logged in or the account no longer exists.</response>
         [HttpGet("me")]
+        [ProducesResponseType(typeof(ProfileDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetMyProfile()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
@@ -57,7 +72,18 @@ namespace RaceDay.Api.Controllers
             });
         }
 
+        /// <summary>
+        /// Updates the profile of the currently logged-in user.
+        /// </summary>
+        /// <param name="request">The profile details to update.</param>
+        /// <returns>The updated profile or an error response.</returns>
+        /// <response code="200">The profile was updated successfully.</response>
+        /// <response code="400">The first name or last name is missing.</response>
+        /// <response code="401">The user is not logged in or the account no longer exists.</response>
         [HttpPut("me")]
+        [ProducesResponseType(typeof(ProfileDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> UpdateMyProfile(
             [FromBody] UpdateProfileRequest request)
         {
