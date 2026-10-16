@@ -34,7 +34,10 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "API for managing race events, participants, categories, enrolments and results."
     });
-
+    options.IncludeXmlComments(
+    Path.Combine(
+        AppContext.BaseDirectory,
+        $"{typeof(Program).Assembly.GetName().Name}.xml"));
     options.EnableAnnotations();
 });
 
