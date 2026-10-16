@@ -1,0 +1,30 @@
+
+name: RaceDay CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore RaceDay.Api.Tests/RaceDay.Api.Tests.csproj
+
+      - name: Build test project and dependencies
+        run: dotnet build RaceDay.Api.Tests/RaceDay.Api.Tests.csproj --configuration Release --no-restore
+
+      - name: Run automated tests
+        run: dotnet test RaceDay.Api.Tests/RaceDay.Api.Tests.csproj --configuration Release --no-build --verbosity normal
