@@ -43,7 +43,7 @@ RaceDay.Api.Tests/
 └── EventsApiTests.cs
 .github/
 └── workflows/
-    └── ci.yml
+    └── dotnet.yml
 ```
 
 -   `RaceDay.Api`: API endpoints and database access.
@@ -73,7 +73,7 @@ not commit real passwords or secrets to a public repository.
 
 ## How to Run the API
 
-1.  Open `RaceDay.Api.sln` in Visual Studio.
+1.  Open `<img width="960" height="504" alt="image" src="https://github.com/user-attachments/assets/43aea454-faa6-456b-8168-84991378638a" />` in Visual Studio.
 2.  Restore NuGet packages.
 3.  Check the SQL Server connection string and ensure the database
     exists.
@@ -200,7 +200,7 @@ invalid credentials, unauthenticated access and role restrictions.
 
 ## GitHub Actions / CI
 
-The workflow is located at `.github/workflows/ci.yml`. It should restore
+The workflow is located at `.github/workflows/dotnet.yml`. It should restore
 dependencies, build the solution and run tests when code is pushed.
 
 To check the result, open the repository on GitHub, select **Actions**,
