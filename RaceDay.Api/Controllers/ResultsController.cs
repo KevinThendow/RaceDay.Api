@@ -7,17 +7,29 @@ using RaceDay.Contracts;
 
 namespace RaceDay.Api.Controllers
 {
+    /// <summary>
+    /// Provides endpoints for recording, viewing and updating event results.
+    /// </summary>
     [ApiController]
     [Route("api")]
     public class ResultsController : ControllerBase
     {
         private readonly RaceDayDbContext _context;
 
+        /// <summary>
+        /// Initializes the results controller.
+        /// </summary>
+        /// <param name="context">The RaceDay database context.</param>
         public ResultsController(RaceDayDbContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// Converts a result entity into a result DTO.
+        /// </summary>
+        /// <param name="result">The result to convert.</param>
+        /// <returns>The result data transfer object.</returns>
         private ResultDto ToDto(Result result)
         {
             return new ResultDto
@@ -30,8 +42,25 @@ namespace RaceDay.Api.Controllers
             };
         }
 
-        // POST: /api/results
+        /// <summary>
+        /// Records a result for a confirmed enrolment in an event
+        /// owned by the logged-in organiser.
+        /// </summary>
+        /// <param name="request">The enrolment and result details.</param>
+        /// <returns>The newly recorded result.</returns>
+        /// <response code="201">The result was created successfully.</response>
+        /// <response code="400">The enrolment is not confirmed or the finishing position is invalid.</response>
+        /// <response code="401">The user is not logged in.</response>
+        /// <response code="403">The user is not authorised to record this result.</response>
+        /// <response code="404">The enrolment does not exist.</response>
+        /// <response code="409">A result already exists for this enrolment.</response>
         [HttpPost("results")]
+        [ProducesResponseType(typeof(ResultDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> CreateResult(
             [FromBody] CreateResultRequest request)
         {
@@ -45,7 +74,7 @@ namespace RaceDay.Api.Controllers
                 });
 
             if (role != "Organiser")
-                return StatusCode(403);
+                return StatusCode(StatusCodes.Status403Forbidden);
 
             var enrolment = await _context.Enrolments
                 .Include(e => e.Event)
@@ -60,7 +89,7 @@ namespace RaceDay.Api.Controllers
 
             if (enrolment.Event == null ||
                 enrolment.Event.OrganiserID != userId.Value)
-                return StatusCode(403);
+                return StatusCode(StatusCodes.Status403Forbidden);
 
             if (enrolment.Status != "Confirmed")
             {
@@ -104,11 +133,20 @@ namespace RaceDay.Api.Controllers
             _context.Results.Add(result);
             await _context.SaveChangesAsync();
 
-            return StatusCode(201, ToDto(result));
+            return StatusCode(StatusCodes.Status201Created, ToDto(result));
         }
 
-        // GET: /api/results/mine
+        /// <summary>
+        /// Retrieves all results belonging to the logged-in participant.
+        /// </summary>
+        /// <returns>The participant's results.</returns>
+        /// <response code="200">Results retrieved successfully.</response>
+        /// <response code="401">The user is not logged in.</response>
+        /// <response code="403">The user is not a participant.</response>
         [HttpGet("results/mine")]
+        [ProducesResponseType(typeof(IEnumerable<ResultDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetMyResults()
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
@@ -118,7 +156,7 @@ namespace RaceDay.Api.Controllers
                 return Unauthorized();
 
             if (role != "Participant")
-                return StatusCode(403);
+                return StatusCode(StatusCodes.Status403Forbidden);
 
             var results = await _context.Results
                 .Where(r =>
@@ -129,8 +167,20 @@ namespace RaceDay.Api.Controllers
             return Ok(results.Select(ToDto));
         }
 
-        // GET: /api/events/{eventId}/results
+        /// <summary>
+        /// Retrieves results for an event owned by the logged-in organiser.
+        /// </summary>
+        /// <param name="eventId">The event identifier.</param>
+        /// <returns>The event's results.</returns>
+        /// <response code="200">Results retrieved successfully.</response>
+        /// <response code="401">The user is not logged in.</response>
+        /// <response code="403">The user is not authorised to view these results.</response>
+        /// <response code="404">The event does not exist.</response>
         [HttpGet("events/{eventId:int}/results")]
+        [ProducesResponseType(typeof(IEnumerable<ResultDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetEventResults(int eventId)
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
@@ -140,7 +190,7 @@ namespace RaceDay.Api.Controllers
                 return Unauthorized();
 
             if (role != "Organiser")
-                return StatusCode(403);
+                return StatusCode(StatusCodes.Status403Forbidden);
 
             var ev = await _context.Events
                 .FirstOrDefaultAsync(e => e.EventID == eventId);
@@ -152,7 +202,7 @@ namespace RaceDay.Api.Controllers
                 });
 
             if (ev.OrganiserID != userId.Value)
-                return StatusCode(403);
+                return StatusCode(StatusCodes.Status403Forbidden);
 
             var results = await _context.Results
                 .Where(r =>
@@ -163,8 +213,23 @@ namespace RaceDay.Api.Controllers
             return Ok(results.Select(ToDto));
         }
 
-        // PUT: /api/results/{id}
+        /// <summary>
+        /// Updates the result for an event owned by the logged-in organiser.
+        /// </summary>
+        /// <param name="id">The result identifier.</param>
+        /// <param name="request">The updated finishing time and position.</param>
+        /// <returns>A confirmation that the result was updated.</returns>
+        /// <response code="200">The result was updated successfully.</response>
+        /// <response code="400">The finishing position is invalid.</response>
+        /// <response code="401">The user is not logged in.</response>
+        /// <response code="403">The user is not authorised to update this result.</response>
+        /// <response code="404">The result or its associated enrolment or event does not exist.</response>
         [HttpPut("results/{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateResult(
             int id,
             [FromBody] UpdateResultRequest request)
@@ -176,7 +241,7 @@ namespace RaceDay.Api.Controllers
                 return Unauthorized();
 
             if (role != "Organiser")
-                return StatusCode(403);
+                return StatusCode(StatusCodes.Status403Forbidden);
 
             var result = await _context.Results
                 .Include(r => r.Enrolment)
@@ -200,7 +265,7 @@ namespace RaceDay.Api.Controllers
             }
 
             if (result.Enrolment.Event.OrganiserID != userId.Value)
-                return StatusCode(403);
+                return StatusCode(StatusCodes.Status403Forbidden);
 
             if (request.FinishingPosition.HasValue &&
                 request.FinishingPosition.Value < 1)
