@@ -234,9 +234,8 @@ differences between planned and implemented routes.
 
 ## Video Presentation
 
-Add your Unlisted YouTube video URL here before submission:
 
-`[Paste your Unlisted YouTube video URL here]`
+https://youtu.be/L0vX8K-UiKk
 
 The video should show the API in Swagger, registration and login,
 Organiser and Participant functionality, a rejected wrong-role request,
