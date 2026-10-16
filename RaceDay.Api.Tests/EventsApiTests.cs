@@ -345,6 +345,28 @@ namespace RaceDay.Api.Tests
                 HttpStatusCode.BadRequest,
                 response.StatusCode);
         }
+        [Fact]
+        public async Task UpdateResult_WithoutLogin_ReturnsUnauthorized()
+        {
+            var json = """
+    {
+        "finishTime": "00:35:12",
+        "finishingPosition": 1
+    }
+    """;
 
+            var content = new StringContent(
+                json,
+                Encoding.UTF8,
+                "application/json");
+
+            var response = await _client.PutAsync(
+                "/api/results/1",
+                content);
+
+            Assert.Equal(
+                HttpStatusCode.Unauthorized,
+                response.StatusCode);
+        }
     }
 }

@@ -39,7 +39,10 @@ namespace RaceDay.Api.Controllers
             string? role = HttpContext.Session.GetString("Role");
 
             if (userId == null)
-                return Unauthorized(new { message = "Please log in first." });
+                return Unauthorized(new
+                {
+                    message = "Please log in first."
+                });
 
             if (role != "Organiser")
                 return Forbid();
@@ -50,7 +53,10 @@ namespace RaceDay.Api.Controllers
                     e => e.EnrolmentID == request.EnrolmentId);
 
             if (enrolment == null)
-                return NotFound(new { message = "Enrolment not found." });
+                return NotFound(new
+                {
+                    message = "Enrolment not found."
+                });
 
             if (enrolment.Event == null ||
                 enrolment.Event.OrganiserID != userId.Value)
@@ -60,7 +66,8 @@ namespace RaceDay.Api.Controllers
             {
                 return BadRequest(new
                 {
-                    message = "Only confirmed enrolments can receive results."
+                    message =
+                        "Only confirmed enrolments can receive results."
                 });
             }
 
@@ -74,13 +81,15 @@ namespace RaceDay.Api.Controllers
             }
 
             bool resultExists = await _context.Results
-                .AnyAsync(r => r.EnrolmentID == request.EnrolmentId);
+                .AnyAsync(r =>
+                    r.EnrolmentID == request.EnrolmentId);
 
             if (resultExists)
             {
                 return Conflict(new
                 {
-                    message = "A result already exists for this enrolment."
+                    message =
+                        "A result already exists for this enrolment."
                 });
             }
 
@@ -112,8 +121,9 @@ namespace RaceDay.Api.Controllers
                 return Forbid();
 
             var results = await _context.Results
-                .Where(r => r.Enrolment != null &&
-                            r.Enrolment.ParticipantID == userId.Value)
+                .Where(r =>
+                    r.Enrolment != null &&
+                    r.Enrolment.ParticipantID == userId.Value)
                 .ToListAsync();
 
             return Ok(results.Select(ToDto));
@@ -136,23 +146,28 @@ namespace RaceDay.Api.Controllers
                 .FirstOrDefaultAsync(e => e.EventID == eventId);
 
             if (ev == null)
-                return NotFound(new { message = "Event not found." });
+                return NotFound(new
+                {
+                    message = "Event not found."
+                });
 
             if (ev.OrganiserID != userId.Value)
                 return Forbid();
 
             var results = await _context.Results
-                .Where(r => r.Enrolment != null &&
-                            r.Enrolment.EventID == eventId)
+                .Where(r =>
+                    r.Enrolment != null &&
+                    r.Enrolment.EventID == eventId)
                 .ToListAsync();
 
             return Ok(results.Select(ToDto));
         }
 
-        [HttpPut("{id}")]
+        // PUT: /api/results/{id}
+        [HttpPut("results/{id:int}")]
         public async Task<IActionResult> UpdateResult(
-        int id,
-        [FromBody] UpdateResultRequest request)
+            int id,
+            [FromBody] UpdateResultRequest request)
         {
             int? userId = HttpContext.Session.GetInt32("UserId");
             string? role = HttpContext.Session.GetString("Role");
@@ -169,16 +184,31 @@ namespace RaceDay.Api.Controllers
                 .FirstOrDefaultAsync(r => r.ResultID == id);
 
             if (result == null)
-                return NotFound("Result not found.");
+                return NotFound(new
+                {
+                    message = "Result not found."
+                });
+
+            if (result.Enrolment == null ||
+                result.Enrolment.Event == null)
+            {
+                return NotFound(new
+                {
+                    message = "Associated enrolment or event not found."
+                });
+            }
 
             if (result.Enrolment.Event.OrganiserID != userId.Value)
                 return Forbid();
 
             if (request.FinishingPosition.HasValue &&
-                request.FinishingPosition.Value <= 0)
+                request.FinishingPosition.Value < 1)
             {
-                return BadRequest(
-                    "Finishing position must be greater than zero.");
+                return BadRequest(new
+                {
+                    message =
+                        "Finishing position must be greater than zero."
+                });
             }
 
             result.FinishTime = request.FinishTime;
