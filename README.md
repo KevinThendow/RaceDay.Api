@@ -43,7 +43,7 @@ RaceDay.Api.Tests/
 └── EventsApiTests.cs
 .github/
 └── workflows/
-    └── ci.yml
+    └── dotnet.yml
 ```
 
 -   `RaceDay.Api`: API endpoints and database access.
@@ -200,7 +200,7 @@ invalid credentials, unauthenticated access and role restrictions.
 
 ## GitHub Actions / CI
 
-The workflow is located at `.github/workflows/ci.yml`. It should restore
+The workflow is located at `.github/workflows/dotnet.yml`. It should restore
 dependencies, build the solution and run tests when code is pushed.
 
 To check the result, open the repository on GitHub, select **Actions**,
