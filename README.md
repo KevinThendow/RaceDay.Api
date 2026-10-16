@@ -209,8 +209,19 @@ mark.
 
 ### GitHub Actions Screenshot
 
-Insert a screenshot of a successful green workflow run here before
-submission:
+
+## Continuous Integration (CI)
+
+The RaceDay API uses GitHub Actions to automatically build the
+solution and run automated tests. The workflow helps verify
+that changes compile successfully and that the tests pass.
+
+### Successful CI Build
+
+The screenshot below shows evidence of a successful RaceDay
+CI workflow run.
+
+![RaceDay CI Success](docs/images/ci-green-build.png)
 
 `
 
