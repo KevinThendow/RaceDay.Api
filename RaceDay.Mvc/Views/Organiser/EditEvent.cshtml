@@ -1,0 +1,127 @@
+﻿@model RaceDay.Contracts.EventDto
+
+@{
+    ViewData["Title"] = "Edit Event";
+}
+
+<div class="container mt-4">
+
+    <h2>Edit Race Event</h2>
+
+    <p>Update the details of your race event below.</p>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <form asp-controller="Organiser"
+          asp-action="EditEvent"
+          asp-route-id="@Model.EventId"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label class="form-label">Event Name</label>
+
+            <input type="text"
+                   name="EventName"
+                   value="@Model.EventName"
+                   class="form-control"
+                   required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Description</label>
+
+            <textarea name="Description"
+                      class="form-control"
+                      rows="4">@Model.Description</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Event Date</label>
+
+            <input type="date"
+                   name="EventDate"
+                   value="@Model.EventDate.ToString("yyyy-MM-dd")"
+                   class="form-control"
+                   required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Location</label>
+
+            <input type="text"
+                   name="Location"
+                   value="@Model.Location"
+                   class="form-control"
+                   required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Distance (km)</label>
+
+            <input type="number"
+                   name="Distance"
+                   value="@Model.Distance"
+                   class="form-control"
+                   step="0.01"
+                   min="0.01"
+                   max="1000"
+                   required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Event Type</label>
+
+            <select name="EventType" class="form-select" required>
+
+                <option value="Running"
+                        selected="@(Model.EventType == "Running")">
+                    Running
+                </option>
+
+                <option value="Cycling"
+                        selected="@(Model.EventType == "Cycling")">
+                    Cycling
+                </option>
+
+                <option value="Walking"
+                        selected="@(Model.EventType == "Walking")">
+                    Walking
+                </option>
+
+                <option value="Triathlon"
+                        selected="@(Model.EventType == "Triathlon")">
+                    Triathlon
+                </option>
+
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Banner Image URL</label>
+
+            <input type="url"
+                   name="BannerImageUrl"
+                   value="@Model.BannerImageUrl"
+                   class="form-control" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Save Changes
+        </button>
+
+        <a asp-controller="Organiser"
+           asp-action="Events"
+           class="btn btn-secondary">
+            Cancel
+        </a>
+
+    </form>
+
+</div>
