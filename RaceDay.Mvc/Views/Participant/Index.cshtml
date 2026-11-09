@@ -1,0 +1,181 @@
+﻿
+@model List<RaceDay.Contracts.EventDto>
+
+@{
+    ViewData["Title"] = "Participant Dashboard";
+}
+
+<div class="container mt-4">
+
+    <h2>Participant Dashboard</h2>
+    <p>Welcome! Explore events and manage your participation.</p>
+
+    <!-- Participant Navigation -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex flex-wrap gap-2">
+
+                <a asp-controller="Participant"
+                   asp-action="Index"
+                   class="btn btn-primary">
+                    <i class="bi bi-calendar-event"></i>
+                    Upcoming Events
+                </a>
+
+                <a asp-controller="Participant"
+                   asp-action="MyEvents"
+                   class="btn btn-outline-primary">
+                    <i class="bi bi-list-check"></i>
+                    My Events
+                </a>
+
+                <a asp-controller="Participant"
+                   asp-action="MyResults"
+                   class="btn btn-outline-success">
+                    <i class="bi bi-trophy"></i>
+                    My Results
+                </a>
+
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mb-3">Upcoming Race Events</h4>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <!-- Search and filter -->
+    <form asp-controller="Participant"
+          asp-action="Index"
+          method="get"
+          class="row g-3 mb-4">
+
+        <div class="col-md-4">
+            <label class="form-label">Event Type</label>
+
+            <select name="type" class="form-select">
+                <option value="">All Event Types</option>
+
+                <option value="Running"
+                        selected="@(ViewBag.SelectedType == "Running")">
+                    Running
+                </option>
+
+                <option value="Cycling"
+                        selected="@(ViewBag.SelectedType == "Cycling")">
+                    Cycling
+                </option>
+
+                <option value="Walking"
+                        selected="@(ViewBag.SelectedType == "Walking")">
+                    Walking
+                </option>
+
+                <option value="Triathlon"
+                        selected="@(ViewBag.SelectedType == "Triathlon")">
+                    Triathlon
+                </option>
+            </select>
+        </div>
+
+        <div class="col-md-5">
+            <label class="form-label">Search events</label>
+
+            <input type="text"
+                   name="search"
+                   value="@ViewBag.Search"
+                   class="form-control"
+                   placeholder="Search by event name or location..." />
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary me-2">
+                Search
+            </button>
+
+            <a asp-action="Index"
+               class="btn btn-secondary">
+                Clear
+            </a>
+        </div>
+
+    </form>
+
+    <!-- Event listings -->
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            No upcoming events were found.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+
+            @foreach (var raceEvent in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+
+                    <div class="card h-100 shadow-sm">
+
+                        @if (!string.IsNullOrEmpty(raceEvent.BannerImageUrl))
+                        {
+                            <img src="@raceEvent.BannerImageUrl"
+                                 class="card-img-top"
+                                 style="height:180px; object-fit:cover;"
+                                 alt="Event banner" />
+                        }
+
+                        <div class="card-body">
+
+                            <h5 class="card-title">
+                                @raceEvent.EventName
+                            </h5>
+
+                            <p class="card-text">
+                                <strong>Location:</strong>
+                                @raceEvent.Location
+                            </p>
+
+                            <p class="card-text">
+                                <strong>Date:</strong>
+                                @raceEvent.EventDate.ToString("dd MMM yyyy")
+                            </p>
+
+                            <p class="card-text">
+                                <strong>Distance:</strong>
+                                @raceEvent.Distance km
+                            </p>
+
+                            <p class="card-text">
+                                <strong>Type:</strong>
+                                @raceEvent.EventType
+                            </p>
+
+                        </div>
+
+                        <div class="card-footer bg-white">
+
+                            <a asp-controller="Participant"
+                               asp-action="Details"
+                               asp-route-id="@raceEvent.EventId"
+                               class="btn btn-primary btn-sm">
+                                View Details
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
