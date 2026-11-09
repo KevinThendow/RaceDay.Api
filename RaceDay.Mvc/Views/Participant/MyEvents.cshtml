@@ -1,0 +1,92 @@
+﻿
+@model List<RaceDay.Contracts.EnrolmentDto>
+
+@{
+    ViewData["Title"] = "My Events";
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-3">My Events</h2>
+
+    <p class="text-muted">
+        View the events you have entered and track your enrolment status.
+    </p>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            You have not entered any events yet.
+            <a asp-controller="Participant"
+               asp-action="Index">
+                Browse upcoming events
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Enrolment ID</th>
+                        <th>Event ID</th>
+                        <th>Category ID</th>
+                        <th>Entry Date</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var enrolment in Model)
+                    {
+                        <tr>
+                            <td>@enrolment.EnrolmentId</td>
+                            <td>@enrolment.EventId</td>
+                            <td>@enrolment.CategoryId</td>
+                            <td>
+                                @enrolment.EnrolmentDate.ToString("dd MMM yyyy")
+                            </td>
+                            <td>
+                                @if (enrolment.Status == "Confirmed")
+                                {
+                                    <span class="badge bg-success">
+                                        Confirmed
+                                    </span>
+                                }
+                                else if (enrolment.Status == "Cancelled")
+                                {
+                                    <span class="badge bg-danger">
+                                        Cancelled
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning text-dark">
+                                        @enrolment.Status
+                                    </span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    }
+
+    <a asp-controller="Participant"
+       asp-action="Index"
+       class="btn btn-primary mt-3">
+        Browse Upcoming Events
+    </a>
+
+</div>
