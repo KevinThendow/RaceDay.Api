@@ -1,0 +1,209 @@
+﻿
+@model List<RaceDay.Contracts.ResultDto>
+
+@{
+    ViewData["Title"] = "Event Results";
+    var eventId = (int)ViewBag.EventId;
+
+    var confirmedEnrolments =
+        ViewBag.ConfirmedEnrolments
+        as List<RaceDay.Contracts.EnrolmentDto>
+        ?? new List<RaceDay.Contracts.EnrolmentDto>();
+}
+
+<div class="container mt-4">
+
+    <h2>Event Results</h2>
+
+    <p>Results for Event ID: @eventId</p>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <hr />
+
+    <h4>Existing Results</h4>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            No results have been recorded for this event yet.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+
+            <table class="table table-bordered table-striped">
+
+                <thead>
+                    <tr>
+                        <th>Result ID</th>
+                        <th>Enrolment ID</th>
+                        <th>Finish Time</th>
+                        <th>Finishing Position</th>
+                        <th>Recorded At</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var result in Model)
+                    {
+                        <tr>
+                            <td>@result.ResultId</td>
+                            <td>@result.EnrolmentId</td>
+                            <td>
+                                @(result.FinishTime?.ToString()
+                                    ?? "Not recorded")
+                            </td>
+                            <td>
+                                @(result.FinishingPosition?.ToString()
+                                    ?? "Not recorded")
+                            </td>
+                            <td>
+                                @result.RecordedAt.ToString("dd MMM yyyy HH:mm")
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+
+    <hr />
+
+    <h4>Record Race Results</h4>
+
+    <p>
+        Only confirmed participants who do not already have a result
+        can receive a result.
+    </p>
+
+    @if (!confirmedEnrolments.Any())
+    {
+        <div class="alert alert-warning">
+            There are currently no confirmed participants eligible
+            for results.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+
+            <table class="table table-bordered table-striped">
+
+                <thead>
+                    <tr>
+                        <th>Enrolment ID</th>
+                        <th>Participant ID</th>
+                        <th>Category ID</th>
+                        <th>Finish Time</th>
+                        <th>Finishing Position</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var enrolment in confirmedEnrolments)
+                    {
+                        var existingResult = Model?.FirstOrDefault(
+                            r => r.EnrolmentId == enrolment.EnrolmentId);
+
+                        <tr>
+                            <td>@enrolment.EnrolmentId</td>
+                            <td>@enrolment.ParticipantId</td>
+                            <td>@enrolment.CategoryId</td>
+
+                            <td colspan="3">
+
+                                @if (existingResult != null)
+                                {
+                                    <span class="badge bg-success">
+                                        Result already recorded
+                                    </span>
+                                }
+                                else
+                                {
+                                    <form asp-controller="Organiser"
+                                          asp-action="CreateResult"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="eventId"
+                                               value="@eventId" />
+
+                                        <input type="hidden"
+                                               name="request.EnrolmentId"
+                                               value="@enrolment.EnrolmentId" />
+
+                                        <div class="row g-2">
+
+                                            <div class="col-md-4">
+                                                <input type="time"
+                                                       name="request.FinishTime"
+                                                       step="1"
+                                                       class="form-control"
+                                                       title="Finish time (hours, minutes and seconds)" />
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <input type="number"
+                                                       name="request.FinishingPosition"
+                                                       min="1"
+                                                       class="form-control"
+                                                       placeholder="Position" />
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <button type="submit"
+                                                        class="btn btn-primary btn-sm">
+                                                    Record Result
+                                                </button>
+                                            </div>
+
+                                        </div>
+
+                                    </form>
+                                }
+
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    }
+
+    <a asp-controller="Organiser"
+       asp-action="Events"
+       class="btn btn-secondary">
+        Back to Events
+    </a>
+
+</div>
