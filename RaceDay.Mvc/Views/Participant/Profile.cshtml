@@ -1,0 +1,131 @@
+﻿
+@model RaceDay.Contracts.ProfileDto
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container mt-4">
+    <h2>My Profile</h2>
+    <p>View and update your personal information.</p>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["Error"]
+        </div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body text-center">
+            @if (!string.IsNullOrWhiteSpace(Model.ProfileImageUrl))
+            {
+                <img src="@Model.ProfileImageUrl"
+                     alt="Profile picture"
+                     class="rounded-circle mb-3"
+                     style="width:150px;height:150px;object-fit:cover;" />
+            }
+            else
+            {
+                <div class="rounded-circle bg-light border mx-auto mb-3 d-flex align-items-center justify-content-center"
+                     style="width:150px;height:150px;">
+                    <span>No photo</span>
+                </div>
+            }
+
+            <h5>@Model.FirstName @Model.LastName</h5>
+            <p class="text-muted">@Model.Email</p>
+
+            <form asp-action="UploadProfileImage"
+                  method="post"
+                  enctype="multipart/form-data">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <input type="file"
+                           name="file"
+                           class="form-control"
+                           accept=".jpg,.jpeg,.png,.webp"
+                           required />
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Upload Profile Picture
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header">
+            <h5 class="mb-0">Personal Information</h5>
+        </div>
+
+        <div class="card-body">
+            <form asp-action="UpdateProfile" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="mb-3">
+                    <label class="form-label">First Name</label>
+                    <input name="FirstName"
+                           value="@Model.FirstName"
+                           class="form-control"
+                           required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Last Name</label>
+                    <input name="LastName"
+                           value="@Model.LastName"
+                           class="form-control"
+                           required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    <input value="@Model.Email"
+                           class="form-control"
+                           readonly />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Phone Number</label>
+                    <input name="PhoneNumber"
+                           value="@Model.PhoneNumber"
+                           class="form-control" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Date of Birth</label>
+                    <input type="date"
+                           name="DateOfBirth"
+                           value="@(Model.DateOfBirth?.ToString("yyyy-MM-dd"))"
+                           class="form-control" />
+                </div>
+
+                <button type="submit" class="btn btn-success">
+                    Save Changes
+                </button>
+
+                <a asp-action="Index"
+                   class="btn btn-secondary">
+                    Back to Events
+                </a>
+            </form>
+        </div>
+    </div>
+</div>

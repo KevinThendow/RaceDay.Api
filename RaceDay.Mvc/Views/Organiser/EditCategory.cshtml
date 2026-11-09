@@ -1,0 +1,100 @@
+﻿
+@model RaceDay.Contracts.UpdateCategoryRequest
+
+@{
+    ViewData["Title"] = "Edit Category";
+    var categoryId = (int)ViewBag.CategoryId;
+    var eventId = (int)ViewBag.EventId;
+}
+
+<div class="container mt-4">
+
+    <h2>Edit Event Category</h2>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <form asp-action="EditCategory"
+          asp-route-id="@categoryId"
+          asp-route-eventId="@eventId"
+          method="post">
+
+        @Html.AntiForgeryToken()
+
+        <div class="mb-3">
+            <label asp-for="CategoryName" class="form-label">
+                Category Name
+            </label>
+
+            <input asp-for="CategoryName" class="form-control" />
+
+            <span asp-validation-for="CategoryName"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="CategoryType" class="form-label">
+                Category Type
+            </label>
+
+            <select asp-for="CategoryType" class="form-select">
+                <option value="">-- Select Category Type --</option>
+                <option value="Age">Age</option>
+                <option value="Distance">Distance</option>
+            </select>
+
+            <span asp-validation-for="CategoryType"
+                  class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="MinAge" class="form-label">
+                Minimum Age
+            </label>
+
+            <input asp-for="MinAge"
+                   type="number"
+                   class="form-control"
+                   min="1" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="MaxAge" class="form-label">
+                Maximum Age
+            </label>
+
+            <input asp-for="MaxAge"
+                   type="number"
+                   class="form-control"
+                   min="1" />
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Distance" class="form-label">
+                Distance (km)
+            </label>
+
+            <input asp-for="Distance"
+                   type="number"
+                   class="form-control"
+                   step="0.01"
+                   min="0.01" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Save Changes
+        </button>
+
+        <a asp-action="Categories"
+           asp-route-eventId="@eventId"
+           class="btn btn-secondary">
+            Cancel
+        </a>
+
+    </form>
+
+</div>

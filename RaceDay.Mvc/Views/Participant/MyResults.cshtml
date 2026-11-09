@@ -1,0 +1,93 @@
+﻿
+@model List<RaceDay.Contracts.ResultDto>
+
+@{
+    ViewData["Title"] = "My Results";
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-3">My Results</h2>
+
+    <p class="text-muted">
+        View your recorded race results and finishing positions.
+    </p>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">
+            No results are available yet.
+            Your results will appear here once they have been recorded.
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Event Name</th>
+                        <th>Event Date</th>
+                        <th>Category</th>
+                        <th>Finish Time</th>
+                        <th>Finishing Position</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var result in Model)
+                    {
+                        <tr>
+                            <td>@result.EventName</td>
+
+                            <td>
+                                @if (result.EventDate != DateTime.MinValue)
+                                {
+                                    @result.EventDate.ToString("dd MMM yyyy")
+                                }
+                                else
+                                {
+                                    <span>Not available</span>
+                                }
+                            </td>
+
+                            <td>@result.CategoryName</td>
+
+                            <td>
+                                @(result.FinishTime?.ToString(@"hh\:mm\:ss")
+                                    ?? "Not recorded")
+                            </td>
+
+                            <td>
+                                @if (result.FinishingPosition.HasValue)
+                                {
+                                    @result.FinishingPosition
+                                }
+                                else
+                                {
+                                    <span>Not recorded</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    }
+
+    <a asp-controller="Participant"
+       asp-action="Index"
+       class="btn btn-primary mt-3">
+        Browse Upcoming Events
+    </a>
+
+</div>

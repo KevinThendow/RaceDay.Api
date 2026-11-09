@@ -1,0 +1,147 @@
+﻿
+@model List<RaceDay.Contracts.EnrolmentDto>
+
+@{
+    ViewData["Title"] = "Event Enrolments";
+    var eventId = (int)ViewBag.EventId;
+}
+
+<h2>Event Enrolments</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<p>Enrolments for Event ID: @eventId</p>
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">
+        @ViewBag.ErrorMessage
+    </div>
+}
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">
+        No participants have enrolled in this event yet.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Enrolment ID</th>
+                <th>Participant ID</th>
+                <th>Category ID</th>
+                <th>Enrolment Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var enrolment in Model)
+            {
+                <tr>
+                    <td>@enrolment.EnrolmentId</td>
+                    <td>@enrolment.ParticipantId</td>
+                    <td>@enrolment.CategoryId</td>
+                    <td>
+                        @enrolment.EnrolmentDate.ToString("dd MMM yyyy")
+                    </td>
+
+                    <td>
+                        @if (enrolment.Status == "Confirmed")
+                        {
+                            <span class="badge bg-success">
+                                Confirmed
+                            </span>
+                        }
+                        else if (enrolment.Status == "Cancelled")
+                        {
+                            <span class="badge bg-danger">
+                                Cancelled
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">
+                                @enrolment.Status
+                            </span>
+                        }
+                    </td>
+
+                    <td>
+                        <form asp-action="UpdateEnrolmentStatus"
+                              asp-controller="Organiser"
+                              method="post"
+                              class="d-inline">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@enrolment.EnrolmentId" />
+
+                            <input type="hidden"
+                                   name="eventId"
+                                   value="@eventId" />
+
+                            <input type="hidden"
+                                   name="status"
+                                   value="Confirmed" />
+
+                            <button type="submit"
+                                    class="btn btn-success btn-sm">
+                                Confirm
+                            </button>
+                        </form>
+
+                        <form asp-action="UpdateEnrolmentStatus"
+                              asp-controller="Organiser"
+                              method="post"
+                              class="d-inline">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@enrolment.EnrolmentId" />
+
+                            <input type="hidden"
+                                   name="eventId"
+                                   value="@eventId" />
+
+                            <input type="hidden"
+                                   name="status"
+                                   value="Cancelled" />
+
+                            <button type="submit"
+                                    class="btn btn-danger btn-sm">
+                                Cancel
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-controller="Organiser"
+   asp-action="Events"
+   class="btn btn-secondary">
+    Back to Events
+</a>
