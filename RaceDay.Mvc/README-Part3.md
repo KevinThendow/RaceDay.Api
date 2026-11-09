@@ -230,7 +230,7 @@ application. The video has **not yet been recorded or uploaded**.
 After recording and uploading the demonstration, replace the placeholder
 below with the actual YouTube URL:
 
-**YouTube demonstration:** `INSERT_YOUTUBE_VIDEO_URL_HERE`
+**YouTube demonstration:** https://youtu.be/I9Uw3wjzIgI
 
 Recommended demonstration contents:
 
